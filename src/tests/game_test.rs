@@ -23,6 +23,10 @@ fn move_left() {
     set_row(&mut game, 0, [2, 0, 2, 4]);
     game.move_board(Direction::LEFT);
     assert_eq!(game.board[0], [4, 4, 0, 0]);
+
+    set_row(&mut game, 0, [2, 4, 8, 16]);
+    game.move_board(Direction::LEFT);
+    assert_eq!(game.board[0], [2, 4, 8, 16]);
 }
 
 #[test]
@@ -44,4 +48,8 @@ fn move_right() {
     set_row(&mut game, 0, [2, 0, 2, 4]);
     game.move_board(Direction::RIGHT);
     assert_eq!(game.board[0], [0, 0, 4, 4]);
+
+    set_row(&mut game, 0, [2, 4, 8, 16]);
+    game.move_board(Direction::RIGHT);
+    assert_eq!(game.board[0], [2, 4, 8, 16]);
 }

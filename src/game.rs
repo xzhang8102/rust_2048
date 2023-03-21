@@ -28,66 +28,70 @@ impl Game {
     fn move_left(&mut self) {
         for row in self.board.iter_mut() {
             let mut start: usize = 0;
-            let mut new_row: [u32; 4] = [0; 4];
             let mut merged = false;
-            for &val in row.iter() {
+            for i in 0..4 {
+                let val = row[i];
                 if val != 0 {
                     if start == 0 {
-                        new_row[start] = val;
+                        row[start] = val;
                         start += 1;
                         merged = false;
                     } else {
-                        if val == new_row[start - 1] {
+                        if val == row[start - 1] {
                             if merged {
-                                new_row[start] = val;
+                                row[start] = val;
                                 start += 1;
                                 merged = false;
                             } else {
-                                new_row[start - 1] += val;
+                                row[start - 1] += val;
                                 merged = true;
                             }
                         } else {
-                            new_row[start] = val;
+                            row[start] = val;
                             start += 1;
                             merged = false;
                         }
                     }
                 }
             }
-            *row = new_row;
+            if start <= 3 {
+                row[start..4].fill(0);
+            }
         }
     }
 
     fn move_right(&mut self) {
         for row in self.board.iter_mut() {
-            let mut start: usize = 3;
-            let mut new_row: [u32; 4] = [0; 4];
+            let mut start: i8 = 3;
             let mut merged = false;
-            for &val in row.iter().rev() {
+            for i in (0..4).rev() {
+                let val = row[i];
                 if val != 0 {
                     if start == 3 {
-                        new_row[start] = val;
+                        row[start as usize] = val;
                         start -= 1;
                         merged = false;
                     } else {
-                        if val == new_row[start + 1] {
+                        if val == row[start as usize + 1] {
                             if merged {
-                                new_row[start] = val;
+                                row[start as usize] = val;
                                 start -= 1;
                                 merged = false;
                             } else {
-                                new_row[start + 1] += val;
+                                row[start as usize + 1] += val;
                                 merged = true;
                             }
                         } else {
-                            new_row[start] = val;
+                            row[start as usize] = val;
                             start -= 1;
                             merged = false;
                         }
                     }
                 }
             }
-            *row = new_row;
+            if start >= 0 {
+                row[0..=(start as usize)].fill(0);
+            }
         }
     }
 }
@@ -98,4 +102,3 @@ pub enum Direction {
     LEFT,
     RIGHT,
 }
-
