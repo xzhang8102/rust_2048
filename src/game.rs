@@ -1,11 +1,13 @@
 pub struct Game {
-    pub(crate) board: [[u32; 4]; 4],
+    pub(crate) board: [[Option<u32>; 4]; 4],
     // pub score: usize,
 }
 
 impl Game {
     pub fn new() -> Self {
-        Self { board: [[0; 4]; 4] }
+        Self {
+            board: [[None; 4]; 4],
+        }
     }
 
     pub fn move_board(&mut self, direction: Direction) {
@@ -18,11 +20,53 @@ impl Game {
     }
 
     fn move_up(&mut self) {
-        todo!()
+        for c in 0..4 {
+            let mut start: usize = 0;
+            let mut merged = false;
+            for r in 0..4 {
+                self.board[r][c].take().map(|val| {
+                    if start == 0 || Some(val) != self.board[start - 1][c] {
+                        self.board[start][c] = Some(val);
+                        start += 1;
+                        merged = false;
+                    } else {
+                        if merged {
+                            self.board[start][c] = Some(val);
+                            start += 1;
+                            merged = false;
+                        } else {
+                            self.board[start - 1][c] = Some(val + val);
+                            merged = true;
+                        }
+                    }
+                });
+            }
+        }
     }
 
     fn move_down(&mut self) {
-        todo!()
+        for c in 0..4 {
+            let mut start: isize = 3;
+            let mut merged = false;
+            for r in (0..4).rev() {
+                self.board[r][c].take().map(|val| {
+                    if start == 3 || Some(val) != self.board[start as usize + 1][c] {
+                        self.board[start as usize][c] = Some(val);
+                        start -= 1;
+                        merged = false;
+                    } else {
+                        if merged {
+                            self.board[start as usize][c] = Some(val);
+                            start -= 1;
+                            merged = false;
+                        } else {
+                            self.board[start as usize + 1][c] = Some(val + val);
+                            merged = true;
+                        }
+                    }
+                });
+            }
+        }
     }
 
     fn move_left(&mut self) {
@@ -30,67 +74,47 @@ impl Game {
             let mut start: usize = 0;
             let mut merged = false;
             for i in 0..4 {
-                let val = row[i];
-                if val != 0 {
-                    if start == 0 {
-                        row[start] = val;
+                row[i].take().map(|val| {
+                    if start == 0 || Some(val) != row[start - 1] {
+                        row[start] = Some(val);
                         start += 1;
                         merged = false;
                     } else {
-                        if val == row[start - 1] {
-                            if merged {
-                                row[start] = val;
-                                start += 1;
-                                merged = false;
-                            } else {
-                                row[start - 1] += val;
-                                merged = true;
-                            }
-                        } else {
-                            row[start] = val;
+                        if merged {
+                            row[start] = Some(val);
                             start += 1;
                             merged = false;
+                        } else {
+                            row[start - 1] = Some(val + val);
+                            merged = true;
                         }
                     }
-                }
-            }
-            if start <= 3 {
-                row[start..4].fill(0);
+                });
             }
         }
     }
 
     fn move_right(&mut self) {
         for row in self.board.iter_mut() {
-            let mut start: i8 = 3;
+            let mut start: isize = 3;
             let mut merged = false;
             for i in (0..4).rev() {
-                let val = row[i];
-                if val != 0 {
-                    if start == 3 {
-                        row[start as usize] = val;
+                row[i].take().map(|val| {
+                    if start == 3 || Some(val) != row[start as usize + 1] {
+                        row[start as usize] = Some(val);
                         start -= 1;
                         merged = false;
                     } else {
-                        if val == row[start as usize + 1] {
-                            if merged {
-                                row[start as usize] = val;
-                                start -= 1;
-                                merged = false;
-                            } else {
-                                row[start as usize + 1] += val;
-                                merged = true;
-                            }
-                        } else {
-                            row[start as usize] = val;
+                        if merged {
+                            row[start as usize] = Some(val);
                             start -= 1;
                             merged = false;
+                        } else {
+                            row[start as usize + 1] = Some(val + val);
+                            merged = true;
                         }
                     }
-                }
-            }
-            if start >= 0 {
-                row[0..=(start as usize)].fill(0);
+                });
             }
         }
     }
