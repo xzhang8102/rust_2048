@@ -1,13 +1,38 @@
+use rand::{rngs::ThreadRng, Rng};
+
 pub struct Game {
     pub(crate) board: [[Option<u32>; 4]; 4],
-    // pub score: usize,
+    rng: ThreadRng,
 }
 
 impl Game {
     pub fn new() -> Self {
         Self {
             board: [[None; 4]; 4],
+            rng: rand::thread_rng(),
         }
+    }
+
+    pub fn start(&mut self) {
+        for _ in 0..2 {
+            self.set_rand();
+        }
+    }
+
+    fn set_rand(&mut self) {
+        let mut available = vec![];
+        for i in 0..16 {
+            if self.board[i / 4][i % 4].is_none() {
+                available.push(i);
+            }
+        }
+        let len = available.len();
+        if len == 0 {
+            return;
+        }
+        let index = self.rng.gen_range(0..len);
+        let new_val = if self.rng.gen::<f64>() > 0.7 { 4 } else { 2 };
+        self.board[index / 4][index % 4] = Some(new_val);
     }
 
     pub fn move_board(&mut self, direction: Direction) {
@@ -16,10 +41,11 @@ impl Game {
             Direction::DOWN => self.move_down(),
             Direction::LEFT => self.move_left(),
             Direction::RIGHT => self.move_right(),
-        }
+        };
+        self.set_rand();
     }
 
-    fn move_up(&mut self) {
+    pub(crate) fn move_up(&mut self) {
         for c in 0..4 {
             let mut start: usize = 0;
             let mut merged = false;
@@ -44,7 +70,7 @@ impl Game {
         }
     }
 
-    fn move_down(&mut self) {
+    pub(crate) fn move_down(&mut self) {
         for c in 0..4 {
             let mut start: isize = 3;
             let mut merged = false;
@@ -69,7 +95,7 @@ impl Game {
         }
     }
 
-    fn move_left(&mut self) {
+    pub(crate) fn move_left(&mut self) {
         for row in self.board.iter_mut() {
             let mut start: usize = 0;
             let mut merged = false;
@@ -94,7 +120,7 @@ impl Game {
         }
     }
 
-    fn move_right(&mut self) {
+    pub(crate) fn move_right(&mut self) {
         for row in self.board.iter_mut() {
             let mut start: isize = 3;
             let mut merged = false;
