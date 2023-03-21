@@ -23,23 +23,23 @@ fn move_left() {
     let mut game = Game::new();
 
     set_row(&mut game, 0, [Some(2), Some(2), Some(2), Some(2)]);
-    game.move_left();
+    assert_eq!(game.move_left(), 4);
     assert_eq!(game.board[0], [Some(4), Some(4), None, None]);
 
     set_row(&mut game, 0, [Some(2), None, None, Some(2)]);
-    game.move_left();
+    assert_eq!(game.move_left(), 4);
     assert_eq!(game.board[0], [Some(4), None, None, None]);
 
     set_row(&mut game, 0, [Some(2), Some(2), Some(4), Some(8)]);
-    game.move_left();
+    assert_eq!(game.move_left(), 8);
     assert_eq!(game.board[0], [Some(4), Some(4), Some(8), None]);
 
     set_row(&mut game, 0, [Some(2), None, Some(2), Some(4)]);
-    game.move_left();
+    assert_eq!(game.move_left(), 4);
     assert_eq!(game.board[0], [Some(4), Some(4), None, None]);
 
     set_row(&mut game, 0, [Some(2), Some(4), Some(8), Some(16)]);
-    game.move_left();
+    assert_eq!(game.move_left(), 16);
     assert_eq!(game.board[0], [Some(2), Some(4), Some(8), Some(16)]);
 }
 
@@ -48,23 +48,23 @@ fn move_right() {
     let mut game = Game::new();
 
     set_row(&mut game, 0, [Some(2), Some(2), Some(2), Some(2)]);
-    game.move_right();
+    assert_eq!(game.move_right(), 4);
     assert_eq!(game.board[0], [None, None, Some(4), Some(4)]);
 
     set_row(&mut game, 0, [Some(2), None, None, Some(2)]);
-    game.move_right();
+    assert_eq!(game.move_right(), 4);
     assert_eq!(game.board[0], [None, None, None, Some(4)]);
 
     set_row(&mut game, 0, [Some(2), Some(2), Some(4), Some(8)]);
-    game.move_right();
+    assert_eq!(game.move_right(), 8);
     assert_eq!(game.board[0], [None, Some(4), Some(4), Some(8)]);
 
     set_row(&mut game, 0, [Some(2), None, Some(2), Some(4)]);
-    game.move_right();
+    assert_eq!(game.move_right(), 4);
     assert_eq!(game.board[0], [None, None, Some(4), Some(4)]);
 
     set_row(&mut game, 0, [Some(2), Some(4), Some(8), Some(16)]);
-    game.move_right();
+    assert_eq!(game.move_right(), 16);
     assert_eq!(game.board[0], [Some(2), Some(4), Some(8), Some(16)]);
 }
 
@@ -73,23 +73,23 @@ fn move_up() {
     let mut game = Game::new();
 
     set_col(&mut game, 0, [Some(2), Some(2), Some(2), Some(2)]);
-    game.move_up();
+    assert_eq!(game.move_up(), 4);
     assert_eq!(get_col(&mut game, 0), [Some(4), Some(4), None, None]);
 
     set_col(&mut game, 0, [Some(2), None, None, Some(2)]);
-    game.move_up();
+    assert_eq!(game.move_up(), 4);
     assert_eq!(get_col(&mut game, 0), [Some(4), None, None, None]);
 
     set_col(&mut game, 0, [Some(2), Some(2), Some(4), Some(8)]);
-    game.move_up();
+    assert_eq!(game.move_up(), 8);
     assert_eq!(get_col(&mut game, 0), [Some(4), Some(4), Some(8), None]);
 
     set_col(&mut game, 0, [Some(2), None, Some(2), Some(4)]);
-    game.move_up();
+    assert_eq!(game.move_up(), 4);
     assert_eq!(get_col(&mut game, 0), [Some(4), Some(4), None, None]);
 
     set_col(&mut game, 0, [Some(2), Some(4), Some(8), Some(16)]);
-    game.move_up();
+    assert_eq!(game.move_up(), 16);
     assert_eq!(get_col(&mut game, 0), [Some(2), Some(4), Some(8), Some(16)]);
 }
 
@@ -98,22 +98,22 @@ fn move_down() {
     let mut game = Game::new();
 
     set_col(&mut game, 0, [Some(2), Some(2), Some(2), Some(2)]);
-    game.move_down();
+    assert_eq!(game.move_down(), 4);
     assert_eq!(get_col(&mut game, 0), [None, None, Some(4), Some(4)]);
 
     set_col(&mut game, 0, [Some(2), None, None, Some(2)]);
-    game.move_down();
+    assert_eq!(game.move_down(), 4);
     assert_eq!(get_col(&mut game, 0), [None, None, None, Some(4)]);
 
     set_col(&mut game, 0, [Some(2), Some(2), Some(4), Some(8)]);
-    game.move_down();
+    assert_eq!(game.move_down(), 8);
     assert_eq!(get_col(&mut game, 0), [None, Some(4), Some(4), Some(8)]);
 
     set_col(&mut game, 0, [Some(2), None, Some(2), Some(4)]);
-    game.move_down();
+    assert_eq!(game.move_down(), 4);
     assert_eq!(get_col(&mut game, 0), [None, None, Some(4), Some(4)]);
 
     set_col(&mut game, 0, [Some(2), Some(4), Some(8), Some(16)]);
-    game.move_down();
+    assert_eq!(game.move_down(), 16);
     assert_eq!(get_col(&mut game, 0), [Some(2), Some(4), Some(8), Some(16)]);
 }
