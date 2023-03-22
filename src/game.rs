@@ -1,16 +1,16 @@
 use rand::{rngs::ThreadRng, Rng};
 
 pub struct Game {
-    pub(crate) board: [[Option<u32>; 4]; 4],
     score: u32,
+    pub(crate) board: [[Option<u32>; 4]; 4],
     rng: ThreadRng,
 }
 
 impl Game {
     pub fn new() -> Self {
         Self {
-            board: [[None; 4]; 4],
             score: 0,
+            board: [[None; 4]; 4],
             rng: rand::thread_rng(),
         }
     }
@@ -51,17 +51,8 @@ impl Game {
     }
 
     fn check_is_end(&self) -> bool {
-        let has_none = self
-            .board
-            .iter()
-            .any(|row| row.iter().any(|val| val.is_none()));
-        if has_none {
-            return false;
-        }
-
-        for r in 0..4 {
-            for c in 0..4 {
-                let val = self.board[r][c];
+        self.board.iter().enumerate().any(|(r, row)| {
+            row.iter().enumerate().any(|(c, val)| {
                 let next_row = if r + 1 < 4 {
                     self.board[r + 1][c]
                 } else {
@@ -72,12 +63,9 @@ impl Game {
                 } else {
                     None
                 };
-                if val == next_row || val == next_col {
-                    return false;
-                }
-            }
-        }
-        return true;
+                val.is_none() || *val == next_row || *val == next_col
+            })
+        })
     }
 
     pub(crate) fn move_up(&mut self) -> u32 {
@@ -86,27 +74,20 @@ impl Game {
             let mut start: usize = 0;
             let mut merged = false;
             for r in 0..4 {
-                self.board[r][c].take().map(|val| {
-                    if start == 0 || Some(val) != self.board[start - 1][c] {
+                if let Some(val) = self.board[r][c].take() {
+                    if start == 0 || Some(val) != self.board[start - 1][c] || merged {
                         max_tile = max_tile.max(val);
                         self.board[start][c] = Some(val);
                         start += 1;
                         merged = false;
                     } else {
-                        if merged {
-                            max_tile = max_tile.max(val);
-                            self.board[start][c] = Some(val);
-                            start += 1;
-                            merged = false;
-                        } else {
-                            let new_val = val + val;
-                            max_tile = max_tile.max(new_val);
-                            self.board[start - 1][c] = Some(new_val);
-                            self.score += new_val;
-                            merged = true;
-                        }
+                        let new_val = val + val;
+                        max_tile = max_tile.max(new_val);
+                        self.board[start - 1][c] = Some(new_val);
+                        self.score += new_val;
+                        merged = true;
                     }
-                });
+                }
             }
         }
         max_tile
@@ -118,27 +99,20 @@ impl Game {
             let mut start: isize = 3;
             let mut merged = false;
             for r in (0..4).rev() {
-                self.board[r][c].take().map(|val| {
-                    if start == 3 || Some(val) != self.board[start as usize + 1][c] {
+                if let Some(val) = self.board[r][c].take() {
+                    if start == 3 || Some(val) != self.board[start as usize + 1][c] || merged {
                         max_tile = max_tile.max(val);
                         self.board[start as usize][c] = Some(val);
                         start -= 1;
                         merged = false;
                     } else {
-                        if merged {
-                            max_tile = max_tile.max(val);
-                            self.board[start as usize][c] = Some(val);
-                            start -= 1;
-                            merged = false;
-                        } else {
-                            let new_val = val + val;
-                            max_tile = max_tile.max(new_val);
-                            self.board[start as usize + 1][c] = Some(new_val);
-                            self.score += new_val;
-                            merged = true;
-                        }
+                        let new_val = val + val;
+                        max_tile = max_tile.max(new_val);
+                        self.board[start as usize + 1][c] = Some(new_val);
+                        self.score += new_val;
+                        merged = true;
                     }
-                });
+                }
             }
         }
         max_tile
@@ -150,27 +124,20 @@ impl Game {
             let mut start: usize = 0;
             let mut merged = false;
             for i in 0..4 {
-                row[i].take().map(|val| {
-                    if start == 0 || Some(val) != row[start - 1] {
+                if let Some(val) = row[i].take() {
+                    if start == 0 || Some(val) != row[start - 1] || merged {
                         max_tile = max_tile.max(val);
                         row[start] = Some(val);
                         start += 1;
                         merged = false;
                     } else {
-                        if merged {
-                            max_tile = max_tile.max(val);
-                            row[start] = Some(val);
-                            start += 1;
-                            merged = false;
-                        } else {
-                            let new_val = val + val;
-                            max_tile = max_tile.max(new_val);
-                            row[start - 1] = Some(new_val);
-                            self.score += new_val;
-                            merged = true;
-                        }
+                        let new_val = val + val;
+                        max_tile = max_tile.max(new_val);
+                        row[start - 1] = Some(new_val);
+                        self.score += new_val;
+                        merged = true;
                     }
-                });
+                }
             }
         }
         max_tile
@@ -182,30 +149,29 @@ impl Game {
             let mut start: isize = 3;
             let mut merged = false;
             for i in (0..4).rev() {
-                row[i].take().map(|val| {
-                    if start == 3 || Some(val) != row[start as usize + 1] {
+                if let Some(val) = row[i].take() {
+                    if start == 3 || Some(val) != row[start as usize + 1] || merged {
                         max_tile = max_tile.max(val);
                         row[start as usize] = Some(val);
                         start -= 1;
                         merged = false;
                     } else {
-                        if merged {
-                            max_tile = max_tile.max(val);
-                            row[start as usize] = Some(val);
-                            start -= 1;
-                            merged = false;
-                        } else {
-                            let new_val = val + val;
-                            max_tile = max_tile.max(new_val);
-                            row[start as usize + 1] = Some(new_val);
-                            self.score += new_val;
-                            merged = true;
-                        }
+                        let new_val = val + val;
+                        max_tile = max_tile.max(new_val);
+                        row[start as usize + 1] = Some(new_val);
+                        self.score += new_val;
+                        merged = true;
                     }
-                });
+                }
             }
         }
         max_tile
+    }
+}
+
+impl Default for Game {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
