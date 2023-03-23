@@ -30,9 +30,9 @@ fn move_left() {
     assert_eq!(game.move_left(), 4);
     assert_eq!(game.board[0], [Some(4), None, None, None]);
 
-    set_row(&mut game, 0, [Some(2), Some(2), Some(4), Some(8)]);
+    set_row(&mut game, 0, [Some(2), Some(2), Some(4), Some(4)]);
     assert_eq!(game.move_left(), 8);
-    assert_eq!(game.board[0], [Some(4), Some(4), Some(8), None]);
+    assert_eq!(game.board[0], [Some(4), Some(8), None, None]);
 
     set_row(&mut game, 0, [Some(2), None, Some(2), Some(4)]);
     assert_eq!(game.move_left(), 4);
@@ -55,9 +55,9 @@ fn move_right() {
     assert_eq!(game.move_right(), 4);
     assert_eq!(game.board[0], [None, None, None, Some(4)]);
 
-    set_row(&mut game, 0, [Some(2), Some(2), Some(4), Some(8)]);
+    set_row(&mut game, 0, [Some(4), Some(4), Some(2), Some(2)]);
     assert_eq!(game.move_right(), 8);
-    assert_eq!(game.board[0], [None, Some(4), Some(4), Some(8)]);
+    assert_eq!(game.board[0], [None, None, Some(8), Some(4)]);
 
     set_row(&mut game, 0, [Some(2), None, Some(2), Some(4)]);
     assert_eq!(game.move_right(), 4);
@@ -80,9 +80,9 @@ fn move_up() {
     assert_eq!(game.move_up(), 4);
     assert_eq!(get_col(&mut game, 0), [Some(4), None, None, None]);
 
-    set_col(&mut game, 0, [Some(2), Some(2), Some(4), Some(8)]);
+    set_col(&mut game, 0, [Some(2), Some(2), Some(4), Some(4)]);
     assert_eq!(game.move_up(), 8);
-    assert_eq!(get_col(&mut game, 0), [Some(4), Some(4), Some(8), None]);
+    assert_eq!(get_col(&mut game, 0), [Some(4), Some(8), None, None]);
 
     set_col(&mut game, 0, [Some(2), None, Some(2), Some(4)]);
     assert_eq!(game.move_up(), 4);
@@ -105,9 +105,9 @@ fn move_down() {
     assert_eq!(game.move_down(), 4);
     assert_eq!(get_col(&mut game, 0), [None, None, None, Some(4)]);
 
-    set_col(&mut game, 0, [Some(2), Some(2), Some(4), Some(8)]);
+    set_col(&mut game, 0, [Some(4), Some(4), Some(2), Some(2)]);
     assert_eq!(game.move_down(), 8);
-    assert_eq!(get_col(&mut game, 0), [None, Some(4), Some(4), Some(8)]);
+    assert_eq!(get_col(&mut game, 0), [None, None, Some(8), Some(4)]);
 
     set_col(&mut game, 0, [Some(2), None, Some(2), Some(4)]);
     assert_eq!(game.move_down(), 4);

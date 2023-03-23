@@ -1,8 +1,8 @@
 use rand::{rngs::ThreadRng, Rng};
 
 pub struct Game {
-    score: u32,
     pub(crate) board: [[Option<u32>; 4]; 4],
+    score: u32,
     rng: ThreadRng,
 }
 
