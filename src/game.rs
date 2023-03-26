@@ -1,4 +1,6 @@
 use rand::{rngs::ThreadRng, Rng};
+use std::io::{self, prelude::*};
+use termion::{clear, color, cursor, event::Key::Char, input::TermRead, raw::IntoRawMode, style};
 
 pub struct Game {
     pub(crate) board: [[Option<u32>; 4]; 4],
@@ -15,10 +17,67 @@ impl Game {
         }
     }
 
-    pub fn start(&mut self) {
+    pub fn start(&mut self) -> io::Result<()> {
+        let stdout = io::stdout().lock();
+        let mut stdout = stdout.into_raw_mode()?;
+        let stdin = io::stdin().lock();
+        let mut stdin_keys = stdin.keys();
+
         for _ in 0..2 {
             self.set_rand();
         }
+
+        write!(stdout, "{}", clear::All)?;
+        write!(stdout, "{}", cursor::Goto(1, 1))?;
+        stdout.write_all(self.board_to_string(None).as_bytes())?;
+        stdout.write_all(
+            format!("\n{}Score: {}{}\n\r", style::Bold, self.score, style::Reset).as_bytes(),
+        )?;
+        stdout.flush().unwrap();
+
+        loop {
+            let op = stdin_keys.next().unwrap().unwrap();
+            let (status, coord) = match op {
+                Char('h') => self.move_board(Direction::Left),
+                Char('j') => self.move_board(Direction::Down),
+                Char('k') => self.move_board(Direction::Up),
+                Char('l') => self.move_board(Direction::Right),
+                Char('q') => break,
+                _ => (GameStatus::Continue, None),
+            };
+            match status {
+                GameStatus::Win => {
+                    write!(stdout, "{}", cursor::Goto(1, 1))?;
+                    stdout.write_all(self.board_to_string(coord).as_bytes())?;
+                    stdout.write_all(
+                        format!("\n{}Score: {}{}\n\r", style::Bold, self.score, style::Reset)
+                            .as_bytes(),
+                    )?;
+                    stdout.flush()?;
+                    break;
+                }
+                GameStatus::Lost => {
+                    // TODO: game is terminated
+                    break;
+                }
+                GameStatus::Continue => {
+                    if coord.is_some() {
+                        write!(stdout, "{}", cursor::Goto(1, 1))?;
+                        stdout.write_all(self.board_to_string(coord).as_bytes())?;
+                        stdout.write_all(
+                            format!("\n{}Score: {}{}\n\r", style::Bold, self.score, style::Reset)
+                                .as_bytes(),
+                        )?;
+                        stdout.flush()?;
+                    }
+                    continue;
+                }
+            };
+        }
+
+        write!(stdout, "{}", style::Reset)?;
+        stdout.flush()?;
+        Ok(())
     }
 
     fn set_rand(&mut self) -> Option<(usize, usize)> {
@@ -36,7 +95,7 @@ impl Game {
         Some((r, c))
     }
 
-    pub fn move_board(&mut self, direction: Direction) -> GameStatus {
+    pub fn move_board(&mut self, direction: Direction) -> (GameStatus, Option<(usize, usize)>) {
         let (max_tile, changed) = match direction {
             Direction::Up => self.move_up(),
             Direction::Down => self.move_down(),
@@ -44,18 +103,18 @@ impl Game {
             Direction::Right => self.move_right(),
         };
         if max_tile == 2048 {
-            return GameStatus::Win;
+            return (GameStatus::Win, None);
         }
         if self.check_is_end() {
-            return GameStatus::Lost;
+            return (GameStatus::Lost, None);
         }
         if changed {
-            self.set_rand();
+            return (GameStatus::Continue, self.set_rand());
         }
-        GameStatus::Continue
+        (GameStatus::Continue, None)
     }
 
-    pub fn board_to_string(&self) -> String {
+    pub fn board_to_string(&self, coord: Option<(usize, usize)>) -> String {
         // game board display:
         // ┌──────┬──────┬──────┬──────┐
         // │      │      │      │      │
@@ -87,7 +146,28 @@ impl Game {
                 output.push('│');
                 for col in 0..4 {
                     match self.board[board_row][col] {
-                        Some(val) => output.push_str(&format!("{:>5} │", val)[..]),
+                        Some(val) => match coord {
+                            Some((r, c)) if r == board_row && c == col => output.push_str(
+                                &format!("{}{:>5}{} │", style::Bold, val, style::Reset)[..],
+                            ),
+                            _ => {
+                                let palette = match val {
+                                    8 => color::Rgb(0xff, 0xe4, 0xe6),
+                                    16 => color::Rgb(0xfe, 0xcd, 0xd3),
+                                    32 => color::Rgb(0xfd, 0xa4, 0xaf),
+                                    64 => color::Rgb(0xfb, 0x71, 0x85),
+                                    128 => color::Rgb(0xf4, 0x3f, 0x5e),
+                                    256 => color::Rgb(0xe1, 0x1d, 0x48),
+                                    512 => color::Rgb(0xbe, 0x12, 0x3c),
+                                    1024 => color::Rgb(0x9f, 0x12, 0x39),
+                                    2048 => color::Rgb(0x88, 0x13, 0x37),
+                                    _ => color::Rgb(0xff, 0xf1, 0xf2),
+                                };
+                                let color_str =
+                                    format!("{}{:>5}{} │", color::Fg(palette), val, style::Reset);
+                                output.push_str(&color_str[..]);
+                            }
+                        },
                         None => output.push_str("      │"),
                     };
                 }
