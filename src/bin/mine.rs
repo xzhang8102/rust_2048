@@ -1,4 +1,5 @@
 #![allow(clippy::all)]
+// source: https://github.com/redox-os/games/blob/80349c4fc60b0440fd6d64892b8cbb53a4ff38c2/src/minesweeper/main.rs
 
 use rand::{rngs::ThreadRng, Rng};
 use std::{

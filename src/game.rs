@@ -46,7 +46,11 @@ impl Game {
                 _ => (GameStatus::Continue, None),
             };
             match status {
-                GameStatus::Win => {
+                GameStatus::Lost => {
+                    // TODO: game is terminated
+                    break;
+                }
+                GameStatus::Win | GameStatus::Continue if coord.is_some() => {
                     write!(stdout, "{}", cursor::Goto(1, 1))?;
                     stdout.write_all(self.board_to_string(coord).as_bytes())?;
                     stdout.write_all(
@@ -54,24 +58,11 @@ impl Game {
                             .as_bytes(),
                     )?;
                     stdout.flush()?;
-                    break;
-                }
-                GameStatus::Lost => {
-                    // TODO: game is terminated
-                    break;
-                }
-                GameStatus::Continue => {
-                    if coord.is_some() {
-                        write!(stdout, "{}", cursor::Goto(1, 1))?;
-                        stdout.write_all(self.board_to_string(coord).as_bytes())?;
-                        stdout.write_all(
-                            format!("\n{}Score: {}{}\n\r", style::Bold, self.score, style::Reset)
-                                .as_bytes(),
-                        )?;
-                        stdout.flush()?;
+                    if status == GameStatus::Win {
+                        break;
                     }
-                    continue;
                 }
+                _ => {}
             };
         }
 
@@ -333,6 +324,7 @@ pub enum Direction {
     Right,
 }
 
+#[derive(PartialEq)]
 pub enum GameStatus {
     Win,
     Lost,
